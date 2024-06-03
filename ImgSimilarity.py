@@ -11,7 +11,7 @@ kp_2, desc_2 = sift.detectAndCompute(target, None)
 
 index_params = {"algorithm":0, "trees":5}
 search_params = dict()
-flann = cv2.FlannBasedMatcher(index_params, search_params)
+flann = cv2.FlannBasedMatcher({"algorithm":0, "trees":5}, {})
 
 matches = flann.knnMatch(desc_1, desc_2, k=2)
 
