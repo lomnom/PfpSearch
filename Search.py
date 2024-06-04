@@ -10,8 +10,11 @@ import yaml
 def finput(prompt):
 	return input(trm.bold+prompt+" "+trm.reset)
 
-def log(*messages,newline=True):
-	trm.fprint(trm.dim+f"[{time.ctime()}]"+trm.reset,*map(str,messages))
+def log(*messages,newline=True,notable=False):
+	if notable:
+		trm.fprint(trm.bold+f"[{time.ctime()}]"+trm.reset,*map(str,messages))
+	else:
+		trm.fprint(trm.dim+f"[{time.ctime()}]"+trm.reset,*map(str,messages))
 	if newline:
 		trm.fprint("\n")
 
@@ -69,7 +72,7 @@ async def addAuthor(item):
 	if item.author.name not in users:
 		users.add(item.author.name)
 		if len(users)%250==0:
-			log(f"{len(users)} users discovered.")
+			log(f"{len(users)} users discovered.",notable=True)
 		await userObjects.put(item.author)
 
 async def submissions():
@@ -85,9 +88,9 @@ async def submissions():
 			await addAuthor(post)
 			await posts.put(post)
 			if n%100==0:
-				log(f"Scraped {n} submissions from {sub.display_name}")
+				log(f"{trm.bold}Scraped {n} submissions from {sub.display_name}{trm.reset}",notable=True)
 	await posts.put(None) #means that its done
-	log("Scraped all submissions!")
+	log("Scraped all submissions!",notable=True)
 tasks.append(submissions())
 
 async def comments():
@@ -106,7 +109,7 @@ async def comments():
 		trm.fprint("\n")
 		for comment in list(comments):
 			await addAuthor(comment)
-	log("Scraped all comments!")
+	log("Scraped all comments!",notable=True)
 	await userObjects.put(None)
 tasks.append(comments())
 
@@ -158,7 +161,7 @@ def crunchPics():
 		outfile.flush()
 		count+=1
 		if count%100==0:
-			log(f"{count} users evaluated!")
+			log(f"{trm.bold}{count} users evaluated!{trm.reset}",notable=True)
 
 		# render=cv2.drawMatches(img,kp,target,targetSift[0],result,None)
 		# showImage(name, render)

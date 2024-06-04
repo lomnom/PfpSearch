@@ -24,7 +24,8 @@ n=0
 for user in users:
 	n+=user[1]
 	percent=round((user[1]/total)*100)
-	print(f"{trm.bold}{trm.f256(round(237+(19*(user[1]/total))))}{percent}%{trm.reset}: u/{user[0]} - {user[1]}/{total}")
+	colour=trm.f256(round(237+(19*(user[1]/total))))
+	print(f"{trm.bold}{colour}{percent}%{trm.reset}, {user[1]}/{total}: https://reddit.com/u/{trm.bold}{user[0]}{trm.reset}")
 
 print(f"In total: {len(users)} users checked")
-print(f"Average score is {n/len(users)}, which makes the average percentage {round((n/len(users))*100)}")
+print(f"Average score is {round((n/len(users))*100)/100}, which makes the average percentage {round(((n/len(users))/total)*10000)/100}%")
