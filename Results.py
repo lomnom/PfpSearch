@@ -22,7 +22,7 @@ for line in data:
 compare=finput("Enter a positive braille diagram or trait list to compare against (press enter if none):")
 
 if compare=='':
-	comparison=lambda user: user[1]
+	comparison=lambda user: -user[1]
 else:
 	if compare[0].isnumeric():
 		compare=list(map(int,compare.split(",")[:-1]))
@@ -38,10 +38,11 @@ else:
 	compare=set(compare)
 	def distance(user):
 		matches=set(user[2])
-		return -len(compare ^ matches)
+		return len(compare ^ matches)
 	comparison=distance
+	maxDist=max(distance(user) for user in users)
 
-users.sort(key=comparison)
+users.sort(key=comparison,reverse=True)
 
 ceil=lambda n:round(n+0.5)
 def brailleChart(total,matches):
@@ -60,7 +61,8 @@ for i,user in enumerate(users):
 	if compare=='':
 		middleText=f"{matchesN}/{total}: "
 	else:
-		middleText=f"d={-distance(user)} "
+		dist=distance(user)
+		middleText=trm.f256(round(255-(19*(dist/maxDist))))+f"d={dist} "+trm.reset
 
 	print(f"{trm.bold}{colour}{percent}%{trm.reset},\t"\
 		f"{trm.inverse if i%2==0 else ''}" \
