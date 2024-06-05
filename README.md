@@ -51,7 +51,7 @@ client_secret: <INSERT HERE
 1. Run `Results.py`
 2. Enter the output file (eg. `Results.txt`)
 3. Enter the positive braille diagram (eg. `⢄⣆⢚⣋⢷⡝⠔⠈` no brackets) or its trait list (eg. `1,2,6,7,` with trailing comma) 
-4. The closest result will be listed at the bottom and the worst one on the top. The value in `d=N` is the difference from the positive result and that listed result.
+4. The closest result will be listed at the bottom and the worst one on the top. The value in `d=N` is the difference from the positive result and that listed result. `d=0` almost always means that the icon is the same.
 5. These are the real results with false positives weeded out.
 
 ## Caveats
