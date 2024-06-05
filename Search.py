@@ -1,10 +1,28 @@
-import asyncpraw as praw
+#Ugly patch for 429 errors lmao
+import asyncprawcore #v2.4.0
+import time
+original=asyncprawcore.Session
+class SessionPatched(original):
+	async def _request_with_retries(self,*args,**kwargs):
+		try:
+			return await super()._request_with_retries(*args,**kwargs)
+		except Exception as e:
+			return await asyncprawcore.requestErrorHandler(self,e,*args,**kwargs)
+asyncprawcore.sessions.Session=SessionPatched
+
+async def requestErrorHandler(session,e,*args,**kwargs):
+	print(type(e),e)
+	log("Request error!! Resting for 3 mins.",notable=True)
+	time.sleep(60*3) # yes it suspends execution of the entire thread.
+	return await session._request_with_retries(*args,**kwargs)
+asyncprawcore.requestErrorHandler=requestErrorHandler
+
+import asyncpraw as praw #asyncpraw 7.7.0!!!!
 import asyncio, aiohttp
 import threading, queue #yes this is an unholy marraige
 import Terminal as trm
 import cv2
 import numpy as np
-import time
 import yaml
 
 def finput(prompt):
