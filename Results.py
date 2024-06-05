@@ -19,7 +19,29 @@ for line in data:
 	matches=list(map(int,matches.split(",")[:-1]))
 	users.append((name,len(matches),matches))
 
-users.sort(key=lambda user: user[1])
+compare=finput("Enter a positive braille diagram or trait list to compare against (press enter if none):")
+
+if compare=='':
+	comparison=lambda user: user[1]
+else:
+	if compare[0].isnumeric():
+		compare=list(map(int,compare.split(",")[:-1]))
+	else:
+		result=[]
+		for n,char in enumerate(compare):
+			char=trm.fromCharacter(char)
+			for i in range(8):
+				if trm.readPixel(char,i)==True:
+					result.append(n*8+i)
+		compare=result
+	print("Comparing to this trait list:",','.join(map(str,compare))+',')
+	compare=set(compare)
+	def distance(user):
+		matches=set(user[2])
+		return -len(compare ^ matches)
+	comparison=distance
+
+users.sort(key=comparison)
 
 ceil=lambda n:round(n+0.5)
 def brailleChart(total,matches):
@@ -34,10 +56,16 @@ for i,user in enumerate(users):
 	n+=matchesN
 	percent=round((matchesN/total)*100)
 	colour=trm.f256(round(237+(19*(matchesN/total))))
+
+	if compare=='\n':
+		middleText=f"{matchesN}/{total}: "
+	else:
+		middleText=f"d={-distance(user)} "
+
 	print(f"{trm.bold}{colour}{percent}%{trm.reset},\t"\
 		f"{trm.inverse if i%2==0 else ''}" \
-		f"[{brailleChart(total,matches)}]{trm.reset} " \
-		f"{matchesN}/{total}: " \
+		f"[{brailleChart(total,matches)}]{trm.reset} "+ \
+		middleText + \
 		f"https://reddit.com/u/{trm.bold}{name}{trm.reset}"
 	)
 
