@@ -57,7 +57,7 @@ for i,user in enumerate(users):
 	percent=round((matchesN/total)*100)
 	colour=trm.f256(round(237+(19*(matchesN/total))))
 
-	if compare=='\n':
+	if compare=='':
 		middleText=f"{matchesN}/{total}: "
 	else:
 		middleText=f"d={-distance(user)} "
