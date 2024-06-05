@@ -13,6 +13,7 @@ asyncprawcore.sessions.Session=SessionPatched
 async def requestErrorHandler(session,e,*args,**kwargs):
 	print(type(e),e)
 	log("Request error!! Resting for 3 mins.",notable=True)
+	log("If the program repeats this line multiple times without resuming, reddit has kicked the bot. ctrl-c twice to end.")
 	time.sleep(60*3) # yes it suspends execution of the entire thread.
 	return await session._request_with_retries(*args,**kwargs)
 asyncprawcore.requestErrorHandler=requestErrorHandler
@@ -67,18 +68,30 @@ async def init():
 		client_secret=config['client_secret'],
 		user_agent="ahem."
 	)
-	subs=finput("Enter the subreddits to scrape from as a space-seperated list:")
+	subs=finput("Enter the subreddit to scrape from:") 
+	#you can enter multiple as a space-seperated list, but 
+	#it is unlikely that they will be evaluated.
 	subs=subs.split(" ")
 
 	outfile=finput("Name the output file:")
 	open(outfile,'w').close()
 	outfile=open(outfile,'a')
 
-	target=cv2.imread(finput("Enter the path to the target image:"),cv2.IMREAD_COLOR)
+	target=finput("Enter the path to the target image, or a reddit user with u/:")
+	if target.startswith("u/"):
+		user=await reddit.redditor("dalithop",fetch=True)
+		async with aiohttp.ClientSession() as session:
+			async with session.get(user.icon_img) as response:
+				data=await response.read()
+		file=np.frombuffer(data, np.uint8)
+		target=cv2.imdecode(file, cv2.IMREAD_COLOR)
+	else:
+		target=cv2.imread(target,cv2.IMREAD_COLOR)
 	targetSift=sift.detectAndCompute(target, None)
 	showImage("Target", target)
 
 	outfile.write(str(len(targetSift[1]))+'\n')
+	log("Run python3 Results.py anytime to analyse results!",notable=True)
 
 	userObjects=asyncio.Queue(256)
 
@@ -175,7 +188,10 @@ def crunchPics():
 		for m in result:
 			indicesFound.add(m.trainIdx)
 		log(name,len(indicesFound),len(targetSift[1]),trm.bold+str(round((len(indicesFound)/len(targetSift[1]))*100))+"%"+trm.reset)
-		outfile.write(name+" "+str(len(indicesFound))+"\n")
+		outfile.write(name+":")
+		for i in indicesFound:
+			outfile.write(str(i)+",")
+		outfile.write("\n")
 		outfile.flush()
 		count+=1
 		if count%100==0:

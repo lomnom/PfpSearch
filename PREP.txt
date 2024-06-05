@@ -1,4 +1,0 @@
-Image requirements:
-- crop out everything that isnt the pfp
-- mirror the image if needed to ensure snoo is facing right
-- Dark mode images work best. Light mode images will have many false positives. be warned.
